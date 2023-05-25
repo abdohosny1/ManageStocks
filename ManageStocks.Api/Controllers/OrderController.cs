@@ -1,0 +1,88 @@
+﻿using ManageStocks.Api.Helper;
+using ManageStocks.ApplicationCore.DTO;
+using ManageStocks.ApplicationCore.Model;
+using ManageStocks.ApplicationCore.unitOfWork;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+
+namespace ManageStocks.Api.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class OrderController : ControllerBase
+    {
+
+        private readonly IUnitOfWork _unitOfWork;
+
+
+        public OrderController(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
+
+        [HttpGet("GetAllOrder")]
+        public async Task<IActionResult> GetAll()
+        {
+            return Ok(await _unitOfWork.Orders.GetAll());
+        }
+        [HttpGet("id")]
+
+        public async Task<IActionResult> GetById(int id)
+        {
+            var order = await _unitOfWork.Orders.GetById(id);
+            if (order is null) return NotFound();
+
+            return Ok(order);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Add(OrderDTO entity)
+        {
+            var socket = await _unitOfWork.Stocks.GetById(entity.StockId);
+            if (socket is null) return NotFound();
+            Order order = new()
+            {
+                PersonName = entity.PersonName,
+                Price = socket.Price*entity.Quentity,
+                Quentity = entity.Quentity,
+                StockId = entity.StockId
+            };
+            _unitOfWork.Orders.Add(order);
+            _unitOfWork.Commit();
+
+            return Ok(order);
+        }
+
+        [HttpPut("id")]
+        public async Task<IActionResult> Update(int id, OrderDTO entity)
+        {
+            var order = await _unitOfWork.Orders.GetById(id);
+            if (order is null) return NotFound();
+
+            var socket = await _unitOfWork.Stocks.GetById(entity.StockId);
+            if (socket is null) return NotFound();
+
+            order.Quentity = entity.Quentity;
+            order.StockId = entity.StockId;
+            order.Price = socket.Price * entity.Quentity;
+            order.PersonName = entity.PersonName;
+
+            _unitOfWork.Orders.Update(order);
+            _unitOfWork.Commit();
+
+            return NoContent();
+        }
+
+        [HttpDelete("id")]
+        public async Task<IActionResult> Delete(int id, OrderDTO entity)
+        {
+            var order = await _unitOfWork.Orders.GetById(id);
+            if (order is null) return NotFound();
+
+            _unitOfWork.Orders.Delete(order);
+            _unitOfWork.Commit();
+
+            return Ok();
+        }
+    }
+}
