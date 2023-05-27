@@ -23,6 +23,8 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 //add service  AddSignalR
 builder.Services.AddSignalR();
+builder.Services.AddScoped<SocketHub>();
+
 
 //add cors
 builder.Services.AddCors(options =>
