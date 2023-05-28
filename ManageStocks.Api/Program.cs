@@ -22,20 +22,37 @@ builder.Services.AddDbContext<ApplicationDbContext>(
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 //add service  AddSignalR
-builder.Services.AddSignalR();
-builder.Services.AddScoped<SocketHub>();
+builder.Services.AddSignalR()
+                .AddHubOptions<SocketHub>(options =>
+                {
+                    options.EnableDetailedErrors = true; // Enable detailed error messages
+                });
+//builder.Services.AddScoped<SocketHub>();
 
 
 //add cors
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy(text,
+//    builder =>
+//    {
+//       // builder.AllowAnyOrigin();
+//        builder.WithOrigins("https://localhost:4200");// the Angular app url
+
+//        //builder.WithOrigins("url");
+//        builder.AllowAnyMethod();
+//        builder.AllowAnyHeader();
+//    });
+//});
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(text,
-    builder =>
+    options.AddDefaultPolicy(builder =>
     {
-        builder.AllowAnyOrigin();
-        //builder.WithOrigins("url");
-        builder.AllowAnyMethod();
-        builder.AllowAnyHeader();
+        builder.WithOrigins("http://localhost:4200") // Specify the allowed origin(s)
+               .AllowAnyHeader()
+               .AllowAnyMethod()
+               .AllowCredentials(); // Allow credentials (e.g., cookies, authorization headers)
     });
 });
 
@@ -51,18 +68,18 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
 
-app.UseCors(text);
+app.UseCors();
 app.UseRouting(); // Add this line to enable routing
+app.UseAuthorization();
 
 //app.MapControllers();
 app.UseEndpoints(endpoints =>
 {
-    endpoints.MapHub<SocketHub>("/sockethub");
     endpoints.MapControllers();
+    endpoints.MapHub<SocketHub>("/socketHub");
 });
-ApplicatioContextSeeding.Seed(app);
+//ApplicatioContextSeeding.Seed(app);
 
 
 app.Run();

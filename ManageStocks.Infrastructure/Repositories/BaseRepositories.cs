@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,7 +17,15 @@ namespace ManageStocks.Infrastructure.Repositories
         {
             _context = context;
         }
+        public async Task<IEnumerable<T>> GellAllAsync(params Expression<Func<T, object>>[] includeProperty)
+        {
 
+            IQueryable<T> quary = _context.Set<T>();
+            quary = includeProperty.Aggregate(quary, (current, includeProperty)
+                                   => current.Include(includeProperty));
+
+            return await quary.ToListAsync();
+        }
         public void Add(T entity)
         {
            _context.Set<T>().Add(entity);

@@ -13,7 +13,7 @@ namespace ManageStocks.ApplicationCore.DTO
         [Required(ErrorMessage ="Enter Name Stock")]
         public string? Name { get; set; }
 
-        public decimal Price { get; set; }
+       // public decimal Price { get; set; }
 
 
     }

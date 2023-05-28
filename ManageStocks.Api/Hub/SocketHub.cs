@@ -13,14 +13,42 @@ namespace ManageStocks.Api.Helper
         private readonly IUnitOfWork _unitOfWork;
 
         private readonly Random _random;
-        public SocketHub(ApplicationDbContext dbContext = null, IUnitOfWork unitOfWork=null)
+        public SocketHub(ApplicationDbContext dbContext, IUnitOfWork unitOfWork)
         {
-            _random = new Random(); ;
             _dbContext = dbContext;
+            _random = new Random();
             _unitOfWork = unitOfWork;
+
+            //   _unitOfWork = unitOfWork;
             //_serviceProvider = serviceProvider;
             //_dbContext = dbContext;
         }
+
+        //public override async Task OnConnectedAsync()
+        //{
+        //    try
+        //    {
+        //        await base.OnConnectedAsync();
+
+        //        // Start sending stock price updates every 10 seconds
+        //        while (true)
+        //        {
+        //            var stocks = await _dbContext.Stocks.ToListAsync();
+        //            foreach (var stock in stocks)
+        //            {
+        //                stock.Price = _random.Next(1, 100);
+        //            }
+        //            await _dbContext.SaveChangesAsync();
+        //            await Clients.All.SendAsync("updateAllPrice", stocks);
+        //            await Task.Delay(TimeSpan.FromSeconds(10));
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"SignalR connection error: {ex.Message}");
+        //    }
+        //}
+
         public override async Task OnConnectedAsync()
         {
             try
@@ -30,7 +58,7 @@ namespace ManageStocks.Api.Helper
                 // Start sending stock price updates every 10 seconds
                 while (true)
                 {
-                    var stocks = _unitOfWork.Stocks.GetAll().Result; // Make sure to await the GetAll() method
+                    var stocks = await _unitOfWork.Stocks.GetAll();   ///_unitOfWork.Stocks.GetAll().Result; // Make sure to await the GetAll() method
                     if (stocks == null)
                     {
                         return;
@@ -38,10 +66,9 @@ namespace ManageStocks.Api.Helper
 
                     foreach (var stock in stocks)
                     {
-                        stock.Price = _random.Next(1, 101); // Update the price to a random value
-                        _unitOfWork.Stocks.Update(stock);
+                        stock.Price = _random.Next(1, 101); 
                     }
-                    _unitOfWork.Commit();
+                    await  _unitOfWork.CommitAsync();
                     await Clients.All.SendAsync("updateAllPrice", stocks);
 
                     await Task.Delay(10000); // Delay for 10 seconds
@@ -52,33 +79,33 @@ namespace ManageStocks.Api.Helper
                 Console.WriteLine($" connection error: {ex.Message}");
             }
         }
-    
-    public async Task SendUpdatedStocks(List<Stock> stocks)
-        {
-            await Clients.All.SendAsync("ReceiveUpdatedStocks", stocks);
-        }
 
-        public async Task SendStockPriceUpdates()
-        {
-            while (true)
-            {
-                var stocks = _unitOfWork.Stocks.GetAll().Result; // Make sure to await the GetAll() method
-                if (stocks == null)
-                {
-                    return;
-                }
+        //public async Task SendUpdatedStocks(List<Stock> stocks)
+        //    {
+        //        await Clients.All.SendAsync("ReceiveUpdatedStocks", stocks);
+        //    }
 
-                foreach (var stock in stocks)
-                {
-                    stock.Price = _random.Next(1, 101); // Update the price to a random value
-                    _unitOfWork.Stocks.Update(stock);
-                }
-                _unitOfWork.Commit();
-                await Clients.All.SendAsync("updateAllPrice", stocks);
+        //    public async Task SendStockPriceUpdates()
+        //    {
+        //        while (true)
+        //        {
+        //            var stocks = _unitOfWork.Stocks.GetAll().Result; // Make sure to await the GetAll() method
+        //            if (stocks == null)
+        //            {
+        //                return;
+        //            }
 
-                await Task.Delay(10000); // Delay for 10 seconds
-            }
-        }
+        //            foreach (var stock in stocks)
+        //            {
+        //                stock.Price = _random.Next(1, 101); // Update the price to a random value
+        //                _unitOfWork.Stocks.Update(stock);
+        //            }
+        //            _unitOfWork.Commit();
+        //            await Clients.All.SendAsync("updateAllPrice", stocks);
+
+        //            await Task.Delay(10000); // Delay for 10 seconds
+        //        }
+        //    }
         //public async Task SendStockPriceUpdate(decimal price)
         //{
         //    await Clients.All.SendAsync("ReceiveStockPriceUpdate", price);

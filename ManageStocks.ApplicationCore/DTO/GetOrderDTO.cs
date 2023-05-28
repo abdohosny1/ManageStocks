@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace ManageStocks.ApplicationCore.DTO
 {
-    public class OrderDTO
+    public class GetOrderDTO
     {
-        
+        public int Id { get; set; }
         public string? PersonName { get; set; }
         public int Quentity { get; set; }
+        public decimal Price { get; set; }
 
-        public int StockId { get; set; }
+        public string? StockName { get; set; }
     }
 }

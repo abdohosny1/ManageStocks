@@ -23,7 +23,16 @@ namespace ManageStocks.Api.Controllers
         [HttpGet("GetAllOrder")]
         public async Task<IActionResult> GetAll()
         {
-            return Ok(await _unitOfWork.Orders.GetAll());
+            var orders = await _unitOfWork.Orders.GellAllAsync(e=>e.Stock);
+            var result = orders.Select(e => new {
+                Quentity = e.Quentity,
+                PersonName = e.PersonName,
+                Price=e.Price,
+                Id = e.Id,
+                StockName = e.Stock.Name
+
+            });
+            return Ok(result);
         }
         [HttpGet("id")]
 
@@ -74,7 +83,7 @@ namespace ManageStocks.Api.Controllers
         }
 
         [HttpDelete("id")]
-        public async Task<IActionResult> Delete(int id, OrderDTO entity)
+        public async Task<IActionResult> Delete(int id)
         {
             var order = await _unitOfWork.Orders.GetById(id);
             if (order is null) return NotFound();

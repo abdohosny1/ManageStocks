@@ -14,19 +14,18 @@ namespace ManageStocks.Api.Controllers
     {
 
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IHubContext<SocketHub> _hubContext;
-        private readonly SocketHub _socketHub;
+        //private readonly IHubContext<SocketHub> _hubContext;
         private readonly Random _random = new Random();
         private readonly object _lock = new object();
         private Timer _timer;
 
 
 
-        public StockController(IUnitOfWork unitOfWork, SocketHub socketHub, IHubContext<SocketHub> hubContext)
+        public StockController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _socketHub = socketHub;
-            _hubContext = hubContext;
+            //_socketHub = socketHub;
+            //_hubContext = hubContext;
         }
 
         [HttpPost("updateprice")]
@@ -57,7 +56,7 @@ namespace ManageStocks.Api.Controllers
                 _unitOfWork.Commit();
 
                 // Get an instance of the StockHub and call the UpdateStockPrices method
-                _hubContext.Clients.All.SendAsync("ReceiveUpdatedStocks", stocks).Wait();
+               // _hubContext.Clients.All.SendAsync("ReceiveUpdatedStocks", stocks).Wait();
             }
         }
         //use signlar
@@ -108,7 +107,16 @@ namespace ManageStocks.Api.Controllers
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll()
         {
-          return Ok( await   _unitOfWork.Stocks.GetAll());
+            try
+            {
+                return Ok(await _unitOfWork.Stocks.GetAll());
+
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return BadRequest();
+            }
         }
 
         [HttpGet("id")]
@@ -125,7 +133,7 @@ namespace ManageStocks.Api.Controllers
             var stock = new Stock() 
             { 
                 Name=entity.Name,
-                Price=entity.Price,
+                Price=0,
             };
             _unitOfWork.Stocks.Add(stock);
             _unitOfWork.Commit();
@@ -138,7 +146,7 @@ namespace ManageStocks.Api.Controllers
             var stock = await _unitOfWork.Stocks.GetById(id);
             if (stock is null) return NotFound();
             stock.Name = entity.Name;
-            stock.Price = entity.Price;
+            
             _unitOfWork.Stocks.Update(stock);
             _unitOfWork.Commit();
             return Ok(stock);
