@@ -79,7 +79,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
     endpoints.MapHub<SocketHub>("/socketHub");
 });
-//ApplicatioContextSeeding.Seed(app);
+ApplicatioContextSeeding.Seed(app);
 
 
 app.Run();

@@ -93,5 +93,28 @@ namespace ManageStocks.Api.Controllers
 
             return Ok();
         }
+
+        [HttpGet("name")]
+        public async Task<ActionResult> GetOrderBYStock(string name)
+        {
+            if (name == null) return BadRequest();
+
+           // var orders = await _unitOfWork.OrderRepository.GetAllOrderByStockName(name);
+            var Allorders = await _unitOfWork.Orders.GellAllAsync(e=>e.Stock);
+            var orders = Allorders.Where(e => e.Stock.Name == name).ToList();
+            if (orders == null)
+                return NotFound();
+
+            var result = orders.Select(e => new {
+                Quentity = e.Quentity,
+                PersonName = e.PersonName,
+                Price = e.Price,
+                Id = e.Id,
+                StockName = e.Stock?.Name
+
+            });
+
+            return Ok(result);
+        }
     }
 }
