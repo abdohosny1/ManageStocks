@@ -1,13 +1,4 @@
-﻿using ManageStocks.ApplicationCore.Model;
-using ManageStocks.ApplicationCore.Repository;
-using ManageStocks.ApplicationCore.unitOfWork;
-using ManageStocks.Infrastructure.Repositories;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
 namespace ManageStocks.Infrastructure.unitOfWork
 {

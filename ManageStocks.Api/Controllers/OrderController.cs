@@ -1,9 +1,4 @@
-﻿using ManageStocks.Api.Helper;
-using ManageStocks.ApplicationCore.DTO;
-using ManageStocks.ApplicationCore.Model;
-using ManageStocks.ApplicationCore.unitOfWork;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
+﻿
 
 namespace ManageStocks.Api.Controllers
 {
@@ -99,7 +94,6 @@ namespace ManageStocks.Api.Controllers
         {
             if (name == null) return BadRequest();
 
-           // var orders = await _unitOfWork.OrderRepository.GetAllOrderByStockName(name);
             var Allorders = await _unitOfWork.Orders.GellAllAsync(e=>e.Stock);
             var orders = Allorders.Where(e => e.Stock.Name == name).ToList();
             if (orders == null)

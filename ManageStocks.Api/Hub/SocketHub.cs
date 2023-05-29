@@ -1,27 +1,20 @@
-﻿using ManageStocks.ApplicationCore.Model;
-using ManageStocks.ApplicationCore.unitOfWork;
+﻿
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
-using System;
+
 
 namespace ManageStocks.Api.Helper
 {
     public class SocketHub : Hub
     {
-        //private readonly IServiceProvider _serviceProvider; 
-        private readonly ApplicationDbContext _dbContext;
         private readonly IUnitOfWork _unitOfWork;
 
         private readonly Random _random;
-        public SocketHub(ApplicationDbContext dbContext, IUnitOfWork unitOfWork)
+        public SocketHub( IUnitOfWork unitOfWork)
         {
-            _dbContext = dbContext;
             _random = new Random();
             _unitOfWork = unitOfWork;
 
-            //   _unitOfWork = unitOfWork;
-            //_serviceProvider = serviceProvider;
-            //_dbContext = dbContext;
+         
         }
 
     

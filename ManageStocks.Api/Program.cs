@@ -6,7 +6,6 @@ using ManageStocks.Infrastructure.unitOfWork;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-string text = "";
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -25,25 +24,11 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddSignalR()
                 .AddHubOptions<SocketHub>(options =>
                 {
-                    options.EnableDetailedErrors = true; // Enable detailed error messages
+                    options.EnableDetailedErrors = true; 
                 });
-//builder.Services.AddScoped<SocketHub>();
-
 
 //add cors
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy(text,
-//    builder =>
-//    {
-//       // builder.AllowAnyOrigin();
-//        builder.WithOrigins("https://localhost:4200");// the Angular app url
 
-//        //builder.WithOrigins("url");
-//        builder.AllowAnyMethod();
-//        builder.AllowAnyHeader();
-//    });
-//});
 
 builder.Services.AddCors(options =>
 {
